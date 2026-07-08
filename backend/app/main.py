@@ -14,6 +14,7 @@ from app.routers.allocation import router as allocation_router
 # Import Routers
 from app.routers.student import router as student_router
 from app.routers.dashboard import router as dashboard_router
+from app.routers.ai import router as ai_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -27,7 +28,7 @@ app.include_router(course_router)
 app.include_router(preference_router)
 app.include_router(allocation_router)
 app.include_router(dashboard_router)
-
+app.include_router(ai_router)
 
 @app.get("/")
 def home():
