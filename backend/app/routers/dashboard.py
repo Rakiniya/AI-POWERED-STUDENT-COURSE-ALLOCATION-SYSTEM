@@ -87,13 +87,15 @@ def course_statistics(db: Session = Depends(get_db)):
 
     for course in courses:
 
-        total = db.query(Allocation).filter(
+        allocated = db.query(Allocation).filter(
             Allocation.course_id == course.id
         ).count()
 
         result.append({
             "course": course.course_name,
-            "allocated_students": total
+            "total_seats": course.total_seats,
+            "allocated_students": allocated,
+            "available_seats": course.total_seats - allocated
         })
 
     return result
