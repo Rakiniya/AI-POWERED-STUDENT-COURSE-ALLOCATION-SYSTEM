@@ -15,6 +15,7 @@ router = APIRouter(
 )
 
 
+# Create Course
 @router.post("/", response_model=CourseResponse)
 def create_course(course: CourseCreate, db: Session = Depends(get_db)):
 
@@ -26,6 +27,19 @@ def create_course(course: CourseCreate, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=400,
             detail="Course already exists."
+        )
+
+    reserved_seats = (
+        course.general_seats +
+        course.obc_seats +
+        course.sc_seats +
+        course.st_seats
+    )
+
+    if reserved_seats > course.total_seats:
+        raise HTTPException(
+            status_code=400,
+            detail="Reserved seats cannot exceed total seats."
         )
 
     new_course = Course(
@@ -43,11 +57,12 @@ def create_course(course: CourseCreate, db: Session = Depends(get_db)):
 
     return new_course
 
+
 # Get All Courses
 @router.get("/", response_model=list[CourseResponse])
 def get_all_courses(db: Session = Depends(get_db)):
-    courses = db.query(Course).all()
-    return courses
+    return db.query(Course).all()
+
 
 # Get Course By ID
 @router.get("/{course_id}", response_model=CourseResponse)
@@ -64,6 +79,7 @@ def get_course(course_id: int, db: Session = Depends(get_db)):
         )
 
     return course
+
 
 # Update Course
 @router.put("/{course_id}", response_model=CourseResponse)
@@ -83,6 +99,30 @@ def update_course(
             detail="Course not found."
         )
 
+    existing_course = db.query(Course).filter(
+        Course.course_name == updated_course.course_name,
+        Course.id != course_id
+    ).first()
+
+    if existing_course:
+        raise HTTPException(
+            status_code=400,
+            detail="Course name already exists."
+        )
+
+    reserved_seats = (
+        updated_course.general_seats +
+        updated_course.obc_seats +
+        updated_course.sc_seats +
+        updated_course.st_seats
+    )
+
+    if reserved_seats > updated_course.total_seats:
+        raise HTTPException(
+            status_code=400,
+            detail="Reserved seats cannot exceed total seats."
+        )
+
     course.course_name = updated_course.course_name
     course.total_seats = updated_course.total_seats
     course.general_seats = updated_course.general_seats
@@ -94,6 +134,7 @@ def update_course(
     db.refresh(course)
 
     return course
+
 
 # Delete Course
 @router.delete("/{course_id}")

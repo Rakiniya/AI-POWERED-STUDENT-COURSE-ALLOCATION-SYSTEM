@@ -6,11 +6,6 @@ import {
   Box,
 } from "@mui/material";
 
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import PeopleIcon from "@mui/icons-material/People";
-import SchoolIcon from "@mui/icons-material/School";
-import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
-import SmartToyIcon from "@mui/icons-material/SmartToy";
 
 import { Link, useLocation } from "react-router-dom";
 
@@ -21,27 +16,26 @@ function Navbar() {
   {
     label: "Dashboard",
     path: "/",
-    icon: <DashboardIcon />
   },
   {
     label: "Students",
     path: "/students",
-    icon: <PeopleIcon />
   },
   {
     label: "Courses",
     path: "/courses",
-    icon: <SchoolIcon />
+  },
+  {
+    label: "Preferences",
+    path: "/preferences",
   },
   {
     label: "Allocation",
     path: "/allocation",
-    icon: <AssignmentTurnedInIcon />
   },
   {
     label: "AI Assistant",
     path: "/ai",
-    icon: <SmartToyIcon />
   },
 ];
   return (
@@ -60,7 +54,6 @@ function Navbar() {
             flexGrow: 1,
           }}
         >
-          <SchoolIcon sx={{ mr: 1 }} />
 
           <Typography
             variant="h6"
@@ -90,7 +83,6 @@ function Navbar() {
   }}
 >
 
-  {item.icon}
 
   {item.label}
 

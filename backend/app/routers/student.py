@@ -14,6 +14,8 @@ router = APIRouter(
     tags=["Students"]
 )
 
+VALID_CATEGORIES = ["General", "OBC", "SC", "ST"]
+
 
 # Create Student
 @router.post("/", response_model=StudentResponse)
@@ -27,6 +29,18 @@ def create_student(student: StudentCreate, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=400,
             detail="Student ID already exists."
+        )
+
+    if student.category not in VALID_CATEGORIES:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid category. Allowed: General, OBC, SC, ST."
+        )
+
+    if student.marks < 0 or student.marks > 100:
+        raise HTTPException(
+            status_code=400,
+            detail="Marks should be between 0 and 100."
         )
 
     new_student = Student(
@@ -46,8 +60,8 @@ def create_student(student: StudentCreate, db: Session = Depends(get_db)):
 # Get All Students
 @router.get("/", response_model=list[StudentResponse])
 def get_all_students(db: Session = Depends(get_db)):
-    students = db.query(Student).all()
-    return students
+    return db.query(Student).all()
+
 
 # Get Student By ID
 @router.get("/{student_id}", response_model=StudentResponse)
@@ -64,6 +78,7 @@ def get_student(student_id: int, db: Session = Depends(get_db)):
         )
 
     return student
+
 
 # Update Student
 @router.put("/{student_id}", response_model=StudentResponse)
@@ -83,6 +98,29 @@ def update_student(
             detail="Student not found."
         )
 
+    existing_student = db.query(Student).filter(
+        Student.student_id == updated_student.student_id,
+        Student.id != student_id
+    ).first()
+
+    if existing_student:
+        raise HTTPException(
+            status_code=400,
+            detail="Student ID already exists."
+        )
+
+    if updated_student.category not in VALID_CATEGORIES:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid category. Allowed: General, OBC, SC, ST."
+        )
+
+    if updated_student.marks < 0 or updated_student.marks > 100:
+        raise HTTPException(
+            status_code=400,
+            detail="Marks should be between 0 and 100."
+        )
+
     student.student_id = updated_student.student_id
     student.name = updated_student.name
     student.marks = updated_student.marks
@@ -92,6 +130,7 @@ def update_student(
     db.refresh(student)
 
     return student
+
 
 # Delete Student
 @router.delete("/{student_id}")
