@@ -5,6 +5,12 @@ import {
   CardContent,
   Typography,
   CircularProgress,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Paper,
 } from "@mui/material";
 
 import api from "../services/api";
@@ -20,6 +26,7 @@ function Dashboard() {
   const [seatUtilization, setSeatUtilization] = useState<any[]>([]);
   const [rejectionRate, setRejectionRate] = useState<any[]>([]);
   const [firstPreference, setFirstPreference] = useState<any>(null);
+  const [availableSeats, setAvailableSeats] = useState<any[]>([]);
 
   useEffect(() => {
     loadDashboard();
@@ -45,6 +52,9 @@ function Dashboard() {
       const preferenceResponse = await api.get("/dashboard/first-preference");
       setFirstPreference(preferenceResponse.data);
 
+      const availableResponse = await api.get("/dashboard/available-seats");
+      setAvailableSeats(availableResponse.data);
+
     } catch (error) {
       console.error(error);
     }
@@ -59,10 +69,18 @@ function Dashboard() {
   }
 
   return (
-    <div style={{ padding: "30px" }}>
+    <div
+      style={{
+        padding: "30px",
+        maxWidth: "1400px",
+        margin: "0 auto",
+      }}
+    >
       <Typography variant="h4" gutterBottom>
         Dashboard
       </Typography>
+
+      {/* Summary Cards */}
 
       <Grid container spacing={3}>
 
@@ -70,7 +88,9 @@ function Dashboard() {
           <Card>
             <CardContent>
               <Typography variant="h6">Students</Typography>
-              <Typography variant="h4">{summary.total_students}</Typography>
+              <Typography variant="h4">
+                {summary.total_students}
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -79,7 +99,9 @@ function Dashboard() {
           <Card>
             <CardContent>
               <Typography variant="h6">Courses</Typography>
-              <Typography variant="h4">{summary.total_courses}</Typography>
+              <Typography variant="h4">
+                {summary.total_courses}
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -88,7 +110,9 @@ function Dashboard() {
           <Card>
             <CardContent>
               <Typography variant="h6">Allocated</Typography>
-              <Typography variant="h4">{summary.allocated_students}</Typography>
+              <Typography variant="h4">
+                {summary.allocated_students}
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -97,17 +121,8 @@ function Dashboard() {
           <Card>
             <CardContent>
               <Typography variant="h6">Unallocated</Typography>
-              <Typography variant="h4">{summary.unallocated_students}</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 2 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6">Allocation %</Typography>
               <Typography variant="h4">
-                {summary.allocation_percentage}%
+                {summary.unallocated_students}
               </Typography>
             </CardContent>
           </Card>
@@ -116,7 +131,24 @@ function Dashboard() {
         <Grid size={{ xs: 12, md: 2 }}>
           <Card>
             <CardContent>
-              <Typography variant="h6">1st Preference</Typography>
+              <Typography variant="h6">
+                Allocation %
+              </Typography>
+
+              <Typography variant="h4">
+                {summary.allocation_percentage ?? 0}%
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 2 }}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6">
+                1st Preference
+              </Typography>
+
               <Typography variant="h4">
                 {firstPreference?.success_rate ?? 0}%
               </Typography>
@@ -125,6 +157,8 @@ function Dashboard() {
         </Grid>
 
       </Grid>
+
+      {/* Course Statistics */}
 
       <Card sx={{ mt: 4 }}>
         <CardContent>
@@ -138,6 +172,8 @@ function Dashboard() {
         </CardContent>
       </Card>
 
+      {/* Category Chart */}
+
       <Card sx={{ mt: 4 }}>
         <CardContent>
 
@@ -149,6 +185,8 @@ function Dashboard() {
 
         </CardContent>
       </Card>
+
+      {/* Seat Utilization */}
 
       <Card sx={{ mt: 4 }}>
         <CardContent>
@@ -162,6 +200,8 @@ function Dashboard() {
         </CardContent>
       </Card>
 
+      {/* Rejection Rate */}
+
       <Card sx={{ mt: 4 }}>
         <CardContent>
 
@@ -173,6 +213,52 @@ function Dashboard() {
 
         </CardContent>
       </Card>
+
+      {/* Available Seats */}
+
+      <Paper sx={{ mt: 4, p: 2 }}>
+
+        <Typography variant="h6" gutterBottom>
+          Available Seats
+        </Typography>
+
+        <Table>
+
+          <TableHead>
+            <TableRow>
+              <TableCell><b>Course</b></TableCell>
+              <TableCell><b>General</b></TableCell>
+              <TableCell><b>OBC</b></TableCell>
+              <TableCell><b>SC</b></TableCell>
+              <TableCell><b>ST</b></TableCell>
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+
+            {availableSeats.map((course: any) => (
+
+              <TableRow key={course.course}>
+
+                <TableCell>{course.course}</TableCell>
+
+                <TableCell>{course.General}</TableCell>
+
+                <TableCell>{course.OBC}</TableCell>
+
+                <TableCell>{course.SC}</TableCell>
+
+                <TableCell>{course.ST}</TableCell>
+
+              </TableRow>
+
+            ))}
+
+          </TableBody>
+
+        </Table>
+
+      </Paper>
 
     </div>
   );
