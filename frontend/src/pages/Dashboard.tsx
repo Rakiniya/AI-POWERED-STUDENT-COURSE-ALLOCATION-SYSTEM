@@ -9,10 +9,16 @@ import {
 
 import api from "../services/api";
 import CourseChart from "../components/CourseChart";
+import CategoryChart from "../components/CategoryChart";
+
 
 function Dashboard() {
   const [summary, setSummary] = useState<any>(null);
   const [statistics, setStatistics] = useState<any[]>([]);
+  const [category,setCategory]=useState([]);
+
+  
+  
 
   useEffect(() => {
     loadSummary();
@@ -25,6 +31,9 @@ function Dashboard() {
 
       const statsResponse = await api.get("/dashboard/course-statistics");
       setStatistics(statsResponse.data);
+
+      const cat = await api.get("/dashboard/category-summary");
+      setCategory(cat.data);
     } catch (error) {
       console.error(error);
     }
@@ -97,6 +106,18 @@ function Dashboard() {
           </Typography>
 
           <CourseChart data={statistics} />
+
+          <Card sx={{ mt: 4 }}>
+  <CardContent>
+
+    <Typography variant="h6" gutterBottom>
+      Category-wise Allocation
+    </Typography>
+
+    <CategoryChart data={category} />
+
+  </CardContent>
+</Card>
         </CardContent>
       </Card>
     </div>

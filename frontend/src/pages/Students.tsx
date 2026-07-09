@@ -18,6 +18,9 @@ import {
 } from "@mui/material";
 import api from "../services/api";
 
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+
 function Students() {
   const [students, setStudents] = useState<any[]>([]);
   const [search, setSearch] = useState("");
@@ -45,6 +48,30 @@ function Students() {
       console.error(error);
     }
   };
+
+  const exportExcel=()=>{
+
+const ws=XLSX.utils.json_to_sheet(students);
+
+const wb=XLSX.utils.book_new();
+
+XLSX.utils.book_append_sheet(wb,ws,"Students");
+
+const excelBuffer=XLSX.write(wb,{
+bookType:"xlsx",
+type:"array"
+});
+
+const blob=new Blob(
+[excelBuffer],
+{
+type:"application/octet-stream"
+}
+);
+
+saveAs(blob,"Students.xlsx");
+
+}
 
   const clearForm = () => {
     setEditingId(null);
@@ -236,6 +263,13 @@ setOpenSnackbar(true);
         <Button variant="contained" onClick={loadStudents}>
           Refresh
         </Button>
+
+        <Button
+variant="contained"
+onClick={exportExcel}
+>
+Export Excel
+</Button>
       </Box>
 
       <Paper elevation={3}>
