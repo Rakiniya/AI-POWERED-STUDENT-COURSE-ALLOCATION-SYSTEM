@@ -119,3 +119,21 @@ def category_summary(db: Session = Depends(get_db)):
         })
 
     return result
+
+@router.get("/summary")
+def dashboard_summary(db: Session =Depends(get_db)):
+
+    total_students = db.query(Student).count()
+
+    total_courses = db.query(Course).count()
+
+    allocated_students = db.query(Allocation).count()
+
+    unallocated_students = total_students - allocated_students
+
+    return {
+        "total_students": total_students,
+        "total_courses": total_courses,
+        "allocated_students": allocated_students,
+        "unallocated_students": unallocated_students
+    }
