@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from app.models.preference import Preference
+from app.models.allocation import Allocation
 
 from app.database import get_db
 from app.models.course import Course
@@ -153,6 +155,17 @@ def delete_course(
             detail="Course not found."
         )
 
+    # Delete related preferences
+    db.query(Preference).filter(
+        Preference.course_id == course_id
+    ).delete()
+
+    # Delete related allocations
+    db.query(Allocation).filter(
+        Allocation.course_id == course_id
+    ).delete()
+
+    # Delete the course
     db.delete(course)
     db.commit()
 
