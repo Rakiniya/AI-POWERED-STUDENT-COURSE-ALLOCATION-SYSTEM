@@ -44,7 +44,7 @@ An AI-powered web application that automates student course allocation based on 
 
 ## AI Integration
 
-- OpenAI API
+- GeminiAI API
 
 ---
 
